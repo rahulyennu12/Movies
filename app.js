@@ -36,7 +36,7 @@ const convertDbObjectToResponseObject = (dbObject) => {
 
 const convertDbObjectToResponseObject0 = (dbObject) => {
   return {
-    movieName: dbObject.movie_name,
+    movieId: dbObject.movie_id,
     directorId: dbObject.director_id,
     movieName: dbObject.movie_name,
     leadActor: dbObject.lead_actor,
@@ -54,7 +54,7 @@ app.get("/movies/", async (request, response) => {
 app.post("/movies/", async (request, response) => {
   const { directorId, movieName, leadActor } = request.body;
   const adding = `INSERT INTO movie (movie_id,director_id,movie_name,lead_actor)
-    VALUES ('${directorID}','${movieName}',${leadActor});`;
+    VALUES ('${directorId}','${movieName}',${leadActor});`;
   const add = await db.run(adding);
   response.send("Movie Successfully Added");
 });
@@ -70,8 +70,8 @@ app.put("/movies/:movieId/", async (request, respond) => {
   const { directorId, movieName, leadActor } = request.body;
   const { movieId } = request.params;
   const updating = `UPDATE movie SET 
-    director_id='${directorId}',
-    movie_name=${movieName},
+    director_id=${directorId},
+    movie_name='${movieName}',
     lead_actor='${leadActor}'
     WHERE
     movie_id=${movieId};`;
@@ -105,7 +105,7 @@ app.get("/directors/", async (request, response) => {
 
 app.get("/directors/:directorId/movies/", async (request, response) => {
   const { directorID } = request.params;
-  const movName = `SELECT movie_name FROM movie 
+  const movName = `SELECT * FROM movie 
     Where director_id=${directorID};`;
   const mvArray = await db.get(mvName);
   response.send(mvArray.map((ea) => convertDbObjectToResponseObject(ea)));
