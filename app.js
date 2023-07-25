@@ -53,13 +53,13 @@ app.get("/movies/", async (request, response) => {
 
 app.post("/movies/", async (request, response) => {
   const { directorId, movieName, leadActor } = request.body;
-  const adding = `INSERT INTO movie (movie_id,director_id,movie_name,lead_actor)
-    VALUES ('${directorId}','${movieName}',${leadActor});`;
-  const add = await db.run(adding);
+  const adding = `INSERT INTO movie (director_id,movie_name,lead_actor)
+    VALUES (${directorId},'${movieName}',${leadActor});`;
+  await db.run(adding);
   response.send("Movie Successfully Added");
 });
 
-app.get("/movies/:movieId/", async (request, respond) => {
+app.get("/movies/:movieId/", async (request, response) => {
   const { movieId } = request.params;
   const getmovie = `SELECT * FROM movie WHERE movie_id=${movieId};`;
   const mov = await db.get(getmovie);
@@ -104,11 +104,13 @@ app.get("/directors/", async (request, response) => {
 });
 
 app.get("/directors/:directorId/movies/", async (request, response) => {
-  const { directorID } = request.params;
-  const movName = `SELECT * FROM movie 
-    Where director_id=${directorID};`;
-  const mvArray = await db.get(mvName);
-  response.send(mvArray.map((ea) => convertDbObjectToResponseObject(ea)));
+  const { directorId } = request.params;
+  const movName = `SELECT movie_name FROM movie 
+    Where director_id='${directorId}';`;
+  const mvArray = await db.all(mvName);
+  response.send(
+    mvArray.map((eachMovie) => ({ movieName: eachMovie.movie_name }))
+  );
 });
 
 module.exports = app;
